@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, redirect, url_for
+from flask import Flask, render_template, Response, request, redirect, url_for, flash
 import cv2
 import pickle
 import numpy as np
@@ -7,6 +7,7 @@ import os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+app.secret_key = 'SAMS'
 
 UPLOAD_FOLDER = "static/uploads"
 COORD_FOLDER = "static/coordinate"
@@ -127,6 +128,17 @@ def generate(path, threshold, video_filename):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
+def get_ready_videos():
+    videos = []
+    for filename in os.listdir(UPLOAD_FOLDER):
+        if filename.lower().endswith(('.mp4', '.avi', '.mov', '.mkv')):
+            base_name = os.path.splitext(filename)[0]
+            coord_file = f"CarParkPos_{base_name}.pkl"
+            if os.path.exists(os.path.join(COORD_FOLDER, coord_file)):
+                videos.append(filename)
+    return videos
+
+# Pada route /
 @app.route('/')
 def index():
     threshold = request.args.get('threshold', type=int)
@@ -145,7 +157,24 @@ def index():
                            threshold=threshold,
                            video_ready=video_ready,
                            video_filename=video_filename,
-                           coord_exists=coord_exists)
+                           coord_exists=coord_exists,
+                           ready_videos=get_ready_videos())
+
+
+# @app.route('/upload', methods=['POST'])
+# def upload_video():
+#     if 'video' not in request.files:
+#         return "Tidak ada video", 400
+
+#     file = request.files['video']
+#     if file.filename == '':
+#         return "File tidak dipilih", 400
+
+#     filename = secure_filename(file.filename)
+#     save_path = os.path.join(UPLOAD_FOLDER, filename)
+#     file.save(save_path)
+
+#     return redirect(url_for('index', video_filename=filename, threshold=900))
 
 @app.route('/upload', methods=['POST'])
 def upload_video():
@@ -157,9 +186,17 @@ def upload_video():
         return "File tidak dipilih", 400
 
     filename = secure_filename(file.filename)
-    save_path = os.path.join(UPLOAD_FOLDER, filename)
+    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(save_path)
 
+    base_name = os.path.splitext(filename)[0]
+    coord_path = os.path.join(COORD_FOLDER, f"CarParkPos_{base_name}.pkl")
+    coord_exists = os.path.exists(coord_path)
+
+    if not coord_exists:
+        flash('File koordinat tidak ditemukan untuk video tersebut.', 'error')
+        return redirect(url_for('index'))
+    
     return redirect(url_for('index', video_filename=filename, threshold=900))
 
 @app.route('/video_feed')

@@ -1,34 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Deteksi Parkiran</title>
+
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Toastr CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <!-- Toastr JS & jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='car.png') }}">
+
   <style>
     body {
-      background-color: #f0f4f8;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      flex-direction: column;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f4f8;
       color: #333;
     }
 
+    .main {
+      display: flex;
+      margin-top: 60px;
+      /* agar konten tidak tertutup navbar */
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #ffffff;
+      padding: 20px;
+      border-right: 1px solid #ddd;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      height: calc(100vh - 60px);
+      /* sisakan tinggi navbar */
+      overflow-y: auto;
+      position: sticky;
+      top: 60px;
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      color: #007bff;
+      font-size: 24px;
+      font-weight: bold;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    }
+
     .container {
-      text-align: center;
+      flex: 1;
       padding: 30px;
+      margin: 30px;
       background: white;
+      text-align: center;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border-radius: 12px;
-      max-width: 90vw;
-      width: 800px;
-      margin: 30px 0;
+    }
+
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0px;
+    }
+
+    .sidebar ul li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      padding: 8px 12px;
+      display: block;
+      border-radius: 5px;
+      transition: background-color 0.2s ease;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #f0f0f0;
+      color: #007bff;
+    }
+
+    .sidebar ul li a.active {
+      background-color: #007bff;
+      color: white;
     }
 
     form {
@@ -76,35 +145,119 @@
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Live Deteksi Parkiran</h1>
-
-    <!-- Upload -->
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-      <input type="file" name="video" accept="video/*" required />
-      <button type="submit">Upload Video</button>
-    </form>
-
-    {% if video_filename %}
-    <!-- Threshold -->
-    <form action="/" method="GET">
-      <input type="hidden" name="video_filename" value="{{ video_filename }}" />
-      <input type="number" name="threshold" placeholder="Threshold" value="{{ threshold or 900 }}" required />
-      <button type="submit">Terapkan Threshold</button>
-    </form>
-    {% endif %}
-
-    <!-- Video -->
-    {% if video_ready %}
-    <p>Threshold: {{ threshold }} | Video: {{ video_filename }}</p>
-    <img src="{{ url_for('video_feed') }}?threshold={{ threshold }}&video_filename={{ video_filename }}" alt="Live Feed" />
-    {% elif video_filename and not coord_exists %}
-    <p style="color: red;">File koordinat tidak ditemukan untuk video: {{ video_filename }}.</p>
-    <p>Silakan buat file koordinat <code>CarParkPos_{{ video_filename.split('.')[0] }}.pkl</code> di folder <code>static/coordinate</code>.</p>
-    {% else %}
-    <p>Silakan upload video terlebih dahulu.</p>
-    {% endif %}
+  <!-- Navbar -->
+  <div class="navbar">
+    <span class="navbar-title">Live Deteksi Parkiran</span>
   </div>
+
+  <!-- Wrapper untuk sidebar dan konten -->
+  <div class="main">
+    <!-- Sidebar Video -->
+    <div class="sidebar">
+
+      <!-- Daftar video -->
+      <ul>
+        <!-- Tambah Video Link -->
+        <li>
+          <a href="/" class="{% if not video_filename %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i> Tambah Video
+          </a>
+        </li>
+
+        <!-- List Video yang Siap -->
+        {% for video in ready_videos %}
+        <li>
+          <a href="/?video_filename={{ video }}&threshold=900"
+            class="{% if video == video_filename %}active{% endif %}">
+            {{ video }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+
+    </div>
+
+    <!-- Konten Utama -->
+    <div class="container">
+      <!-- Upload -->
+      {% if not video_filename %}
+      <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="video" accept="video/*" required />
+        <button type="submit">Upload Video</button>
+      </form>
+      {% endif %}
+
+
+      {% if video_filename %}
+      <div>
+        <input type="hidden" id="video_filename" value="{{ video_filename }}" />
+        <input type="number" id="threshold" placeholder="Threshold" value="{{ threshold or 900 }}" required />
+      </div>
+      {% endif %}
+
+      {% if video_ready %}
+      <p id="thresholdInfo">Threshold: {{ threshold }} | Video: {{ video_filename }}</p>
+      <img id="videoStream"
+        src="{{ url_for('video_feed') }}?threshold={{ threshold }}&video_filename={{ video_filename }}"
+        alt="Live Feed" />
+      {% elif video_filename and not coord_exists %}
+      <p style="color: red;">File koordinat tidak ditemukan untuk video: {{ video_filename }}.</p>
+      <p>Silakan buat file koordinat <code>CarParkPos_{{ video_filename.split('.')[0] }}.pkl</code> di
+        folder<code>static/coordinate</code>.</p>
+      {% else %}
+      <p>Silakan upload video terlebih dahulu.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function(){
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          toastr.options = {
+            "closeButton": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+          };
+          toastr["{{ category }}"]("{{ message }}");
+        {% endfor %}
+      {% endwith %}
+    });
+  </script>
+
+
+  <!-- Script Threshold -->
+  <script>
+    let timeout = null;
+    const input = document.getElementById('threshold');
+    const videoFilenameInput = document.getElementById('video_filename');
+    const videoFilename = videoFilenameInput ? videoFilenameInput.value : null;
+    const videoStream = document.getElementById('videoStream');
+    const thresholdInfo = document.getElementById('thresholdInfo');
+
+    if (input) {
+      input.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          const newThreshold = input.value;
+          if (newThreshold && videoFilename && videoStream) {
+            const newSrc =
+              `/video_feed?threshold=${newThreshold}&video_filename=${encodeURIComponent(videoFilename)}&t=${Date.now()}`;
+            videoStream.src = newSrc;
+
+            // Update label
+            thresholdInfo.innerText = `Threshold: ${newThreshold} | Video: ${videoFilename}`;
+
+            // Toastr success
+            toastr.success(`Threshold diperbarui menjadi ${newThreshold}!`);
+          }
+        }, 1000);
+      });
+    }
+  </script>
+
 </body>
+
 </html>
