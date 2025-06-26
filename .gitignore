@@ -1,0 +1,5 @@
+# Abaikan folder output, uploads, videos
+static/uploads/
+videos/
+*.mp4
+venv/

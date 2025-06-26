@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deteksi Parkiran</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='car.png') }}">
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      color: #333;
+    }
+
+    .container {
+      text-align: center;
+      padding: 30px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      max-width: 90vw;
+      width: 800px;
+      margin: 30px 0;
+    }
+
+    form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    input[type="file"],
+    input[type="number"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 18px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    p {
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Live Deteksi Parkiran</h1>
+
+    <!-- Upload -->
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <input type="file" name="video" accept="video/*" required />
+      <button type="submit">Upload Video</button>
+    </form>
+
+    {% if video_filename %}
+    <!-- Threshold -->
+    <form action="/" method="GET">
+      <input type="hidden" name="video_filename" value="{{ video_filename }}" />
+      <input type="number" name="threshold" placeholder="Threshold" value="{{ threshold or 900 }}" required />
+      <button type="submit">Terapkan Threshold</button>
+    </form>
+    {% endif %}
+
+    <!-- Video -->
+    {% if video_ready %}
+    <p>Threshold: {{ threshold }} | Video: {{ video_filename }}</p>
+    <img src="{{ url_for('video_feed') }}?threshold={{ threshold }}&video_filename={{ video_filename }}" alt="Live Feed" />
+    {% elif video_filename and not coord_exists %}
+    <p style="color: red;">File koordinat tidak ditemukan untuk video: {{ video_filename }}.</p>
+    <p>Silakan buat file koordinat <code>CarParkPos_{{ video_filename.split('.')[0] }}.pkl</code> di folder <code>static/coordinate</code>.</p>
+    {% else %}
+    <p>Silakan upload video terlebih dahulu.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
