@@ -1,25 +1,25 @@
-# 🚗 Deteksi Parkiran Otomatis dengan Flask, OpenCV, dan CvZone
+# 🚗 Automatic Parking Detection with Flask, OpenCV, and CvZone ()
 
-Selamat datang di proyek **Deteksi Parkiran Otomatis**, sebuah sistem cerdas berbasis web yang dapat **mendeteksi slot parkir kosong atau terisi secara real-time** menggunakan video rekaman area parkir. Sistem ini cocok digunakan untuk **monitoring parkir di area publik, gedung, atau mall** dengan interface modern dan interaktif.
+Welcome to the Automatic **Parking Detection project**, an intelligent web-based system that can **detect empty or occupied parking slots in real-time** using video footage of the parking area. This system is suitable for **parking monitoring in public areas, buildings, or malls** with a modern and interactive interface.
 
-## ✨ Fitur Unggulan
+## ✨ Top Features
 
-- ✅ Upload video rekaman parkiran langsung via web
-- 🟩 Tandai slot parkir secara interaktif (klik 4 titik di canvas)
-- 🧠 Deteksi slot kosong/terisi secara real-time
-- 📈 Threshold bisa disesuaikan untuk mengatur sensitivitas deteksi
-- 📦 Penyimpanan koordinat area parkir dalam file `.pkl`
-- 🔁 Tampilan video looping tanpa reload
+- ✅ Upload recorded parking lot videos directly via the web
+- 🟩 Mark parking slots interactively (click 4 dots on the canvas)
+- 🧠 Real-time empty/filled slot detection
+- 📈 Threshold can be adjusted to set detection sensitivity
+- 📦 Storage of parking lot coordinates in `.pkl` file
+- 🔁 Looping video display without reloading
 
-## 🖥️ Tampilan Awal Interface
+## 🖥️ Initial Display Interface
 
 ![image](https://github.com/user-attachments/assets/cee4fc9c-f0c9-476c-afbb-1e3690e5c8f6)
 
-> Live video feed akan menampilkan area parkir beserta status setiap slot parkir dalam bentuk kotak berwarna:
-> - 🟩 Hijau = Kosong
-> - 🟥 Merah = Terisi
+> The live video feed will display the parking area and the status of each parking slot in the form of colored boxes:
+> - 🟩 Green = Empty
+> - 🟥 Red = Filled
 
-## 🚀 Cara Menjalankan Aplikasi
+## 🚀 How to Run the App
 
 ### 1. Clone Repository
 ```bash
@@ -28,53 +28,53 @@ cd Parking-Slot-Detection
 ```
 
 ### 2. Install Dependencies
-Pastikan kamu menggunakan Python 3.7+  
+Make sure you are using Python 3.7+ 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Jalankan Server
+### 3. Run the Server
 ```bash
 python main.py
 ```
 
-Buka browser dan akses:  
+Open a browser and access:
 📍 [http://localhost:8000](http://localhost:8000)
 
-## 📂 Struktur Direktori
+## 📂 Directory Structure
 
 ```
 .
 ├── static/
-│   ├── uploads/          # Tempat penyimpanan video yang diunggah
-│   └── coordinate/       # File koordinat parkir disimpan (format .pkl)
+│   ├── uploads/          # Where uploaded videos are stored
+│   └── coordinate/       # Parking coordinates file saved (.pkl format)
 ├── templates/
-│   └── index.html        # Halaman utama
-├── main.py               # File utama backend Flask
-└── README.md             # Dokumentasi proyek ini
-└── requirements.txt      # Library yang perlu di install
+│   └── index.html        # Main Page
+├── main.py               # Flask backend main file
+└── README.md             # Documentation of this project
+└── requirements.txt      # Libraries that need to be installed
 ```
 
-## ⚠️ Catatan Penting
+## ⚠️ Important Notes
 
-- Pastikan kamu sudah memiliki `car.png` sebagai favicon di folder `static/`
-- Gunakan video parkiran yang kualitasnya cukup jelas agar deteksi akurat
-- Saat menandai slot, klik 4 titik membentuk kotak (urutan tidak masalah)
+- Make sure you already have `car.png` as a favicon in the `static/` folder
+- Use a video of the parking lot that is clear enough for accurate detection
+- When marking a slot, click 4 dots to form a square (order doesn't matter)
 
-## 🧠 Teknologi yang Digunakan
+## 🧠 Technology Used
 
-- **Flask**: Framework web backend Python
-- **OpenCV**: Deteksi gambar dan pengolahan video
-- **CvZone**: Library tambahan visualisasi OpenCV
-- **HTML/CSS + JS (Toastr + jQuery)**: Antarmuka modern & responsif
+- **Flask**: Python backend web framework
+- **OpenCV**: Image detection and video processing
+- **CvZone**: OpenCV visualization add-on library
+- **HTML/CSS + JS (Toastr + jQuery)**: Modern & responsive interface
 
-## 📸 Contoh Hasil Deteksi
+## 📸 Sample Detection Results
 
 ![image](https://github.com/user-attachments/assets/2c85db66-ce7e-45d2-bae7-5c87927137fb)
 
-## 🙌 Kontribusi
+## 🙌 Contribution
 
-Proyek ini bersifat open source. Jika kamu ingin menambahkan fitur baru, memperbaiki bug, atau mempercantik tampilan – silakan fork repo ini dan pull request!
+This project is open source. If you want to add new features, fix bugs, or improve the look - please fork this repo and pull request!
 
 ## 🧑‍💻 Developer
 
@@ -84,4 +84,4 @@ Proyek ini bersifat open source. Jika kamu ingin menambahkan fitur baru, memperb
 
 ---
 
-> “Teknologi bukan hanya soal kecanggihan, tapi bagaimana ia menyelesaikan masalah nyata.” 🚀
+> “Technology is not just about sophistication, but how it solves real problems.” 🚀
