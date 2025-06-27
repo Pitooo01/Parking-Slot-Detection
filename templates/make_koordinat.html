@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Video & Tandai Parkir</title>
+  <style>
+    canvas { border: 1px solid black; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h3>Upload Video Parkiran:</h3>
+<form id="uploadForm" enctype="multipart/form-data">
+  <input type="file" name="video" accept="video/*" required>
+  <button type="submit">Upload</button>
+</form>
+
+<canvas id="canvas" width="640" height="360" style="display:none;"></canvas><br>
+<button id="saveBtn" style="display:none;">Simpan Koordinat</button>
+
+<!-- ubah bagian ini dalam <script> -->
+<script>
+  let posList = [];
+  let currentBox = [];
+
+  const form = document.getElementById("uploadForm");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  const saveBtn = document.getElementById("saveBtn");
+
+  let originalWidth = 640; // default
+  let originalHeight = 360;
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    fetch("/upload_video", {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        originalWidth = data.frame_width;
+        originalHeight = data.frame_height;
+
+        // Set canvas to frame size
+        canvas.width = originalWidth;
+        canvas.height = originalHeight;
+
+        const img = new Image();
+        img.onload = () => {
+          canvas.style.display = "block";
+          saveBtn.style.display = "block";
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = `/static/uploads/${data.frame_image}`;
+      } else {
+        alert("Gagal upload video.");
+      }
+    });
+  });
+
+  canvas.addEventListener("click", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = Math.floor((e.clientX - rect.left) * scaleX);
+    const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+    currentBox.push([x, y]);
+
+    ctx.fillStyle = "blue";
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (currentBox.length === 4) {
+      posList.push(currentBox);
+      ctx.strokeStyle = "green";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(...currentBox[0]);
+      currentBox.slice(1).forEach(pt => ctx.lineTo(...pt));
+      ctx.closePath();
+      ctx.stroke();
+      currentBox = [];
+    }
+  });
+
+  saveBtn.addEventListener("click", () => {
+    fetch('/save_coordinates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ posList })
+    }).then(res => {
+      if (res.ok) {
+        alert("✅ Koordinat berhasil disimpan!");
+      } else {
+        alert("❌ Gagal menyimpan koordinat");
+      }
+    });
+  });
+</script>
+
+
+</body>
+</html>

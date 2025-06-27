@@ -161,21 +161,6 @@ def index():
                            ready_videos=get_ready_videos())
 
 
-# @app.route('/upload', methods=['POST'])
-# def upload_video():
-#     if 'video' not in request.files:
-#         return "Tidak ada video", 400
-
-#     file = request.files['video']
-#     if file.filename == '':
-#         return "File tidak dipilih", 400
-
-#     filename = secure_filename(file.filename)
-#     save_path = os.path.join(UPLOAD_FOLDER, filename)
-#     file.save(save_path)
-
-#     return redirect(url_for('index', video_filename=filename, threshold=900))
-
 @app.route('/upload', methods=['POST'])
 def upload_video():
     if 'video' not in request.files:
@@ -195,9 +180,68 @@ def upload_video():
 
     if not coord_exists:
         flash('File koordinat tidak ditemukan untuk video tersebut.', 'error')
-        return redirect(url_for('index'))
-    
+        return redirect(url_for('index', video_filename=filename, threshold=900))  # << ini perbaikannya
+
     return redirect(url_for('index', video_filename=filename, threshold=900))
+
+
+# @app.route('/upload', methods=['POST'])
+# def upload_video():
+#     if 'video' not in request.files:
+#         return "Tidak ada video", 400
+
+#     file = request.files['video']
+#     if file.filename == '':
+#         return "File tidak dipilih", 400
+
+#     filename = secure_filename(file.filename)
+#     save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+#     file.save(save_path)
+
+#     base_name = os.path.splitext(filename)[0]
+#     coord_path = os.path.join(COORD_FOLDER, f"CarParkPos_{base_name}.pkl")
+#     coord_exists = os.path.exists(coord_path)
+
+#     if not coord_exists:
+#         flash('File koordinat tidak ditemukan untuk video tersebut.', 'error')
+#         return redirect(url_for('index'))
+    
+#     return redirect(url_for('index', video_filename=filename, threshold=900))
+
+@app.route('/save_coords', methods=['POST'])
+def save_coords():
+    data = request.get_json()
+    video_filename = data['video_filename']
+    coords = data['coords']
+    base = os.path.splitext(video_filename)[0]
+    coord_path = os.path.join(COORD_FOLDER, f"CarParkPos_{base}.pkl")
+    with open(coord_path, 'wb') as f:
+        pickle.dump(coords, f)
+    return {"status": "ok"}
+
+def pick_video_file():
+    from tkinter import Tk
+    from tkinter.filedialog import askopenfilename
+    Tk().withdraw()
+    path = askopenfilename(
+        title="Pilih video parkiran",
+        filetypes=[("Video Files", "*.mp4 *.avi *.mov *.mkv")]
+    )
+    return path
+
+@app.route('/create')
+def create_coord():
+    video_filename = request.args.get('video_filename')
+    if not video_filename:
+        return redirect(url_for('index'))
+
+    video_path = os.path.join(UPLOAD_FOLDER, video_filename)
+    if not os.path.exists(video_path):
+        flash('Video tidak ditemukan.', 'error')
+        return redirect(url_for('index'))
+
+    return render_template('create.html', video_filename=video_filename)
+
 
 @app.route('/video_feed')
 def video_feed():
@@ -213,6 +257,25 @@ def video_feed():
 
     return Response(generate(video_path, threshold, filename),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+    
+@app.route('/generate_coord', methods=['GET'])
+def generate_coord_from_uploaded_video():
+    video_filename = request.args.get('video_filename')
+    if not video_filename:
+        return "Parameter video_filename tidak ditemukan", 400
+
+    video_path = os.path.join(UPLOAD_FOLDER, video_filename)
+    base_name = os.path.splitext(video_filename)[0]
+    coord_path = os.path.join(COORD_FOLDER, f"CarParkPos_{base_name}.pkl")
+
+    if not os.path.exists(video_path):
+        return f"Video {video_filename} tidak ditemukan.", 404
+
+    if os.path.exists(coord_path):
+        return f"File koordinat untuk {video_filename} sudah ada.", 200
+
+    create_coordinates_with_mouse(video_path, coord_path)
+    return f"Koordinat berhasil dibuat untuk {video_filename}.", 200
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)

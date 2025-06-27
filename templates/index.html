@@ -1,263 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deteksi Parkiran</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deteksi Parkiran</title>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <!-- Toastr CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+    />
+    <!-- Toastr JS & jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='car.png') }}"
+    />
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- Toastr CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-  <!-- Toastr JS & jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='car.png') }}">
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+      }
 
-  <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f4f8;
-      color: #333;
-    }
+      .main {
+        display: flex;
+        margin-top: 60px;
+        /* agar konten tidak tertutup navbar */
+      }
 
-    .main {
-      display: flex;
-      margin-top: 60px;
-      /* agar konten tidak tertutup navbar */
-    }
+      .sidebar {
+        width: 220px;
+        background-color: #ffffff;
+        padding: 20px;
+        border-right: 1px solid #ddd;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+        height: calc(100vh - 60px);
+        /* sisakan tinggi navbar */
+        overflow-y: auto;
+        position: sticky;
+        top: 60px;
+      }
 
-    .sidebar {
-      width: 220px;
-      background-color: #ffffff;
-      padding: 20px;
-      border-right: 1px solid #ddd;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-      height: calc(100vh - 60px);
-      /* sisakan tinggi navbar */
-      overflow-y: auto;
-      position: sticky;
-      top: 60px;
-    }
+      .navbar {
+        background-color: #ffffff;
+        color: #007bff;
+        font-size: 24px;
+        font-weight: bold;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      }
 
-    .navbar {
-      background-color: #ffffff;
-      color: #007bff;
-      font-size: 24px;
-      font-weight: bold;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-    }
+      .container {
+        flex: 1;
+        padding: 30px;
+        margin: 30px;
+        background: white;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+      }
 
-    .container {
-      flex: 1;
-      padding: 30px;
-      margin: 30px;
-      background: white;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-    }
+      .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0px;
+      }
 
-    .sidebar ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0px;
-    }
+      .sidebar ul li {
+        margin-bottom: 10px;
+      }
 
-    .sidebar ul li {
-      margin-bottom: 10px;
-    }
+      .sidebar ul li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        padding: 8px 12px;
+        display: block;
+        border-radius: 5px;
+        transition: background-color 0.2s ease;
+      }
 
-    .sidebar ul li a {
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-      padding: 8px 12px;
-      display: block;
-      border-radius: 5px;
-      transition: background-color 0.2s ease;
-    }
+      .sidebar ul li a:hover {
+        background-color: #f0f0f0;
+        color: #007bff;
+      }
 
-    .sidebar ul li a:hover {
-      background-color: #f0f0f0;
-      color: #007bff;
-    }
+      .sidebar ul li a.active {
+        background-color: #007bff;
+        color: white;
+      }
 
-    .sidebar ul li a.active {
-      background-color: #007bff;
-      color: white;
-    }
+      form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
 
-    form {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+      input[type="file"],
+      input[type="number"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+      }
 
-    input[type="file"],
-    input[type="number"] {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
+      button {
+        padding: 10px 18px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
 
-    button {
-      padding: 10px 18px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
+      button:hover {
+        background-color: #0056b3;
+      }
 
-    button:hover {
-      background-color: #0056b3;
-    }
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
 
-    img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
+      p {
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
 
-    p {
-      font-weight: 500;
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-
-<body>
-  <!-- Navbar -->
-  <div class="navbar">
-    <span class="navbar-title">Live Deteksi Parkiran</span>
-  </div>
-
-  <!-- Wrapper untuk sidebar dan konten -->
-  <div class="main">
-    <!-- Sidebar Video -->
-    <div class="sidebar">
-
-      <!-- Daftar video -->
-      <ul>
-        <!-- Tambah Video Link -->
-        <li>
-          <a href="/" class="{% if not video_filename %}active{% endif %}">
-            <i class="fas fa-plus-circle"></i> Tambah Video
-          </a>
-        </li>
-
-        <!-- List Video yang Siap -->
-        {% for video in ready_videos %}
-        <li>
-          <a href="/?video_filename={{ video }}&threshold=900"
-            class="{% if video == video_filename %}active{% endif %}">
-            {{ video }}
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
-
+  <body>
+    <!-- Navbar -->
+    <div class="navbar">
+      <span class="navbar-title">Live Deteksi Parkiran</span>
     </div>
 
-    <!-- Konten Utama -->
-    <div class="container">
-      <!-- Upload -->
-      {% if not video_filename %}
-      <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="video" accept="video/*" required />
-        <button type="submit">Upload Video</button>
-      </form>
-      {% endif %}
+    <!-- Wrapper untuk sidebar dan konten -->
+    <div class="main">
+      <!-- Sidebar Video -->
+      <div class="sidebar">
+        <!-- Daftar video -->
+        <ul>
+          <!-- Tambah Video Link -->
+          <li>
+            <a href="/" class="{% if not video_filename %}active{% endif %}">
+              <i class="fas fa-plus-circle"></i> Tambah Video
+            </a>
+          </li>
 
-
-      {% if video_filename %}
-      <div>
-        <input type="hidden" id="video_filename" value="{{ video_filename }}" />
-        <input type="number" id="threshold" placeholder="Threshold" value="{{ threshold or 900 }}" required />
+          <!-- List Video yang Siap -->
+          {% for video in ready_videos %}
+          <li>
+            <a
+              href="/?video_filename={{ video }}&threshold=900"
+              class="{% if video == video_filename %}active{% endif %}"
+            >
+              {{ video }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
       </div>
-      {% endif %}
 
-      {% if video_ready %}
-      <p id="thresholdInfo">Threshold: {{ threshold }} | Video: {{ video_filename }}</p>
-      <img id="videoStream"
-        src="{{ url_for('video_feed') }}?threshold={{ threshold }}&video_filename={{ video_filename }}"
-        alt="Live Feed" />
-      {% elif video_filename and not coord_exists %}
-      <p style="color: red;">File koordinat tidak ditemukan untuk video: {{ video_filename }}.</p>
-      <p>Silakan buat file koordinat <code>CarParkPos_{{ video_filename.split('.')[0] }}.pkl</code> di
-        folder<code>static/coordinate</code>.</p>
-      {% else %}
-      <p>Silakan upload video terlebih dahulu.</p>
-      {% endif %}
-    </div>
-  </div>
+      <!-- Konten Utama -->
+      <div class="container">
+        <!-- Upload -->
+        {% if not video_filename %}
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <input type="file" name="video" accept="video/*" required />
+          <button type="submit">Upload Video</button>
+        </form>
+        {% endif %} {% if video_filename %}
+        <div>
+          <input
+            type="hidden"
+            id="video_filename"
+            value="{{ video_filename }}"
+          />
+          <input
+            type="number"
+            id="threshold"
+            placeholder="Threshold"
+            value="{{ threshold or 900 }}"
+            required
+          />
+        </div>
+        {% endif %} {% if video_ready %}
+        <p id="thresholdInfo">
+          Threshold: {{ threshold }} | Video: {{ video_filename }}
+        </p>
+        <img
+          id="videoStream"
+          src="{{ url_for('video_feed') }}?threshold={{ threshold }}&video_filename={{ video_filename }}"
+          alt="Live Feed"
+        />
+        {% elif video_filename and not coord_exists %}
+        <p style="color: red">
+          File koordinat tidak ditemukan untuk video: {{ video_filename }}.
+        </p>
+        <p>Silakan tandai area parkir di bawah ini lalu klik Simpan:</p>
 
-  <script>
-    $(document).ready(function(){
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-          toastr.options = {
-            "closeButton": true,
-            "positionClass": "toast-top-right",
-            "timeOut": "3000"
+        <canvas id="canvas" style="max-width: 100%; height: auto"></canvas>
+        <button id="saveBtn">Simpan Koordinat</button>
+
+        <script>
+          let posList = [];
+          let currentBox = [];
+
+          const canvas = document.getElementById("canvas");
+          const ctx = canvas.getContext("2d");
+          const saveBtn = document.getElementById("saveBtn");
+
+          const frameImage = /static/uploads/{{ video_filename.split('.')[0] }}_frame.jpg;
+
+          const img = new Image();
+          img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
           };
-          toastr["{{ category }}"]("{{ message }}");
-        {% endfor %}
-      {% endwith %}
-    });
-  </script>
+          img.src = frameImage;
 
+          canvas.addEventListener("click", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
 
-  <!-- Script Threshold -->
-  <script>
-    let timeout = null;
-    const input = document.getElementById('threshold');
-    const videoFilenameInput = document.getElementById('video_filename');
-    const videoFilename = videoFilenameInput ? videoFilenameInput.value : null;
-    const videoStream = document.getElementById('videoStream');
-    const thresholdInfo = document.getElementById('thresholdInfo');
+            const x = Math.floor((e.clientX - rect.left) * scaleX);
+            const y = Math.floor((e.clientY - rect.top) * scaleY);
 
-    if (input) {
-      input.addEventListener('input', () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          const newThreshold = input.value;
-          if (newThreshold && videoFilename && videoStream) {
-            const newSrc =
-              `/video_feed?threshold=${newThreshold}&video_filename=${encodeURIComponent(videoFilename)}&t=${Date.now()}`;
-            videoStream.src = newSrc;
+            currentBox.push([x, y]);
 
-            // Update label
-            thresholdInfo.innerText = `Threshold: ${newThreshold} | Video: ${videoFilename}`;
+            ctx.fillStyle = "blue";
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fill();
 
-            // Toastr success
-            toastr.success(`Threshold diperbarui menjadi ${newThreshold}!`);
-          }
-        }, 1000);
-      });
-    }
-  </script>
+            if (currentBox.length === 4) {
+              posList.push(currentBox);
+              ctx.strokeStyle = "green";
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(...currentBox[0]);
+              currentBox.slice(1).forEach(pt => ctx.lineTo(...pt));
+              ctx.closePath();
+              ctx.stroke();
+              currentBox = [];
+            }
+          });
 
-</body>
+          saveBtn.addEventListener("click", () => {
+            fetch('/save_coords', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                coords: posList,
+                video_filename: '{{ video_filename }}'
+              })
+            }).then(res => {
+              if (res.ok) {
+                toastr.success("Koordinat berhasil disimpan!");
+                setTimeout(() => {
+                  window.location.href = /?video_filename={{ video_filename }}&threshold=900;
+                }, 1500);
+              } else {
+                toastr.error("❌ Gagal menyimpan koordinat.");
+              }
+            });
+          });
+        </script>
+        {% else %}
+        <p>Silakan upload video terlebih dahulu.</p>
+        {% endif %}
+      </div>
+    </div>
 
+    <script>
+      let timeout = null;
+      const input = document.getElementById('threshold');
+      const videoFilenameInput = document.getElementById('video_filename');
+      const videoFilename = videoFilenameInput ? videoFilenameInput.value : null;
+      const videoStream = document.getElementById('videoStream');
+      const thresholdInfo = document.getElementById('thresholdInfo');
+
+      if (input) {
+        input.addEventListener('input', () => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            const newThreshold = input.value;
+            if (newThreshold && videoFilename && videoStream) {
+              const newSrc = `/video_feed?threshold=${newThreshold}&video_filename=${encodeURIComponent(videoFilename)}&t=${Date.now()}`;
+              videoStream.src = newSrc;
+
+              // Update label
+              thresholdInfo.innerText = `Threshold: ${newThreshold} | Video: ${videoFilename}`;
+
+              // Toastr success
+              toastr.success(`Threshold diperbarui menjadi ${newThreshold}!`);
+            }
+          }, 1000);
+        });
+      }
+    </script>
+  </body>
 </html>
