@@ -13,7 +13,7 @@ Selamat datang di proyek **Deteksi Parkiran Otomatis**, sebuah sistem cerdas ber
 
 ## 🖥️ Tampilan Antarmuka
 
-<img src="https://via.placeholder.com/600x300?text=Preview+UI" alt="Preview UI" />
+![image](https://github.com/user-attachments/assets/2c85db66-ce7e-45d2-bae7-5c87927137fb)
 
 > Live video feed akan menampilkan area parkir beserta status setiap slot parkir dalam bentuk kotak berwarna:
 > - 🟩 Hijau = Kosong
