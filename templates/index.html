@@ -13,6 +13,10 @@
   <!-- Toastr JS & jQuery -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='car.png') }}">
 
@@ -203,6 +207,16 @@
         src="{{ url_for('video_feed') }}?threshold={{ threshold }}&video_filename={{ video_filename }}"
         alt="Live Feed" />
       {% elif video_filename and not coord_exists %}
+      <script>
+        Swal.fire({
+          icon: 'error',
+          title: 'Koordinat Belum Ada!',
+          text: 'Silakan tambahkan titik koordinat terlebih dahulu dengan mengklik area parkir pada gambar.',
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false
+        });
+      </script>
       <p style="color: red;">File koordinat tidak ditemukan untuk video: {{ video_filename }}.</p>
       <p>Silakan tandai area parkir di bawah ini lalu klik Simpan:</p>
 
