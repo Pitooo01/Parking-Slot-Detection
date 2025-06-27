@@ -13,7 +13,7 @@ Selamat datang di proyek **Deteksi Parkiran Otomatis**, sebuah sistem cerdas ber
 
 ## 🖥️ Tampilan Awal Interface
 
-![image](https://github.com/user-attachments/assets/2c85db66-ce7e-45d2-bae7-5c87927137fb)
+![image](https://github.com/user-attachments/assets/cee4fc9c-f0c9-476c-afbb-1e3690e5c8f6)
 
 > Live video feed akan menampilkan area parkir beserta status setiap slot parkir dalam bentuk kotak berwarna:
 > - 🟩 Hijau = Kosong
@@ -80,7 +80,7 @@ Proyek ini bersifat open source. Jika kamu ingin menambahkan fitur baru, memperb
 
 **ALFITO DWITAMA**  
 📫 Email: alfito.dwitama@gmail.com
-[![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/alfitodwitamaaa)
+📷 Instagram: [@alfitodwitamaaa](https://www.instagram.com/alfitodwitamaaa)
 
 ---
 
