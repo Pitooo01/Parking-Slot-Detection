@@ -173,6 +173,14 @@ def upload_video():
     filename = secure_filename(file.filename)
     save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(save_path)
+    
+    # Generate frame pertama dari video sebagai thumbnail
+    cap = cv2.VideoCapture(save_path)
+    success, frame = cap.read()
+    cap.release()
+    if success:
+        frame_path = os.path.join(UPLOAD_FOLDER, f"{os.path.splitext(filename)[0]}_frame.jpg")
+        cv2.imwrite(frame_path, frame)
 
     base_name = os.path.splitext(filename)[0]
     coord_path = os.path.join(COORD_FOLDER, f"CarParkPos_{base_name}.pkl")
