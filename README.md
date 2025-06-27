@@ -11,7 +11,7 @@ Selamat datang di proyek **Deteksi Parkiran Otomatis**, sebuah sistem cerdas ber
 - 📦 Penyimpanan koordinat area parkir dalam file `.pkl`
 - 🔁 Tampilan video looping tanpa reload
 
-## 🖥️ Tampilan Antarmuka
+## 🖥️ Tampilan Awal Interface
 
 ![image](https://github.com/user-attachments/assets/2c85db66-ce7e-45d2-bae7-5c87927137fb)
 
@@ -23,23 +23,14 @@ Selamat datang di proyek **Deteksi Parkiran Otomatis**, sebuah sistem cerdas ber
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/username/nama-repo.git
-cd nama-repo
+git clone https://github.com/Pitooo01/Parking-Slot-Detection.git
+cd Parking-Slot-Detection
 ```
 
 ### 2. Install Dependencies
 Pastikan kamu menggunakan Python 3.7+  
 ```bash
 pip install -r requirements.txt
-```
-
-Jika belum ada, tambahkan file `requirements.txt` seperti berikut:
-```
-flask
-cv2
-cvzone
-numpy
-werkzeug
 ```
 
 ### 3. Jalankan Server
@@ -61,6 +52,7 @@ Buka browser dan akses:
 │   └── index.html        # Halaman utama
 ├── main.py               # File utama backend Flask
 └── README.md             # Dokumentasi proyek ini
+└── requirements.txt      # Library yang perlu di install
 ```
 
 ## ⚠️ Catatan Penting
@@ -78,7 +70,7 @@ Buka browser dan akses:
 
 ## 📸 Contoh Hasil Deteksi
 
-<img src="https://via.placeholder.com/600x300?text=Contoh+Deteksi+Parkiran" alt="Contoh Deteksi" />
+![image](https://github.com/user-attachments/assets/2c85db66-ce7e-45d2-bae7-5c87927137fb)
 
 ## 🙌 Kontribusi
 
@@ -87,8 +79,8 @@ Proyek ini bersifat open source. Jika kamu ingin menambahkan fitur baru, memperb
 ## 🧑‍💻 Developer
 
 **ALFITO DWITAMA**  
-📫 Email: alfito@example.com  
-🌐 Website: [https://yourwebsite.com](https://yourwebsite.com)
+📫 Email: alfito.dwitama@gmail.com
+[![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/alfitodwitamaaa)
 
 ---
 
